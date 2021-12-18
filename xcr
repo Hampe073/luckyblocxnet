@@ -4754,7 +4754,7 @@ aimbot:Element("Dropdown", "automatic fire", {options = {"off", "standard", "hit
 aimbot:Element("Dropdown", "autoshoot type", {options = {"lucky" ,"standard", "off"}})
 aimbot:Element("Toggle", "autowall")
 aimbot:Element("Dropdown", "autowall type", {options = {"lucky", "standard", "off"}})
-aimbot:Element("Jumbobox", "resolver", {options = {"pitch", "roll", "arms", "animation"}}) 
+aimbot:Element("Jumbobox", "resolver", {options = {"pitch", "roll", "animation", "arms"}}) 
 aimbot:Element("Toggle", "delay shot") 
 aimbot:Element("Toggle", "force hit")
 aimbot:Element("Dropdown", "prediction", {options = {"off", "cframe", "velocity"}}) 
@@ -6399,9 +6399,9 @@ RunService.RenderStepped:Connect(function(step)
 					spawn(function()
 						if Player.Character and Player.Character:FindFirstChild("Humanoid") and Player.Character:FindFirstChild("Humanoid").Health > 20 and Player.Team ~= "TTT" and Player ~= LocalPlayer then      
 							if TBLFIND(values.rage.aimbot.resolver.Jumbobox, "Pitch") then      
-								Player.Character.UpperTorso.Waist.C0 = CFAngles(1, 3, 6)      
-								Player.Character.LowerTorso.Root.C0 = CFAngles(2,4,6)
-								Player.Character.Head.Neck.C0 = CFrame.new(0,5,0) * CFAngles(0, 0, 0) 
+								Player.Character.UpperTorso.Waist.C0 = CFAngles(2, 3, 6)      
+								Player.Character.LowerTorso.Root.C0 = CFAngles(1,4,9)
+								Player.Character.Head.Neck.C0 = CFrame.new(0,0.0001,0) * CFAngles(0, 0, 0) 
 							end      
 							if TBLFIND(values.rage.aimbot.resolver.Jumbobox, "Roll") then      
 								Player.Character.Humanoid.MaxSlopeAngle = 0      
@@ -7963,6 +7963,230 @@ Players.PlayerAdded:Connect(function(Player)
 						Obj.Visible = false 
 					end 
 					Obj.Color3 = values.visuals.players.chams.Color 
+				end 
+			end 
+		end 
+	end) 
+	Player.CharacterAdded:Connect(function(Character) 
+		Character.ChildAdded:Connect(function(obj) 
+			wait(1) 
+			CollisionTBL(obj) 
+		end) 
+		wait(1) 
+		if Character ~= nil then 
+			local Value = INST("Vector3Value") 
+			Value.Name = "OldPosition" 
+			Value.Value = Character.HumanoidRootPart.Position 
+			Value.Parent = Character.HumanoidRootPart 
+			for _,obj in pairs(Character:GetChildren()) do 
+				if obj:IsA("BasePart") and Player ~= LocalPlayer and obj.Name ~= "HumanoidRootPart" and obj.Name ~= "Head" and obj.Name ~= "BackC4" and obj.Name ~= "HeadHB" then 
+					local VisibleCham = INST("BoxHandleAdornment") 
+					VisibleCham.Name = "VisibleCham" 
+					VisibleCham.AlwaysOnTop = false 
+					VisibleCham.ZIndex = 8 
+					VisibleCham.Size = obj.Size + Vec3(0.1,0.1,0.1) 
+					VisibleCham.AlwaysOnTop = false 
+					VisibleCham.Transparency = 0 
+
+					local WallCham = INST("BoxHandleAdornment") 
+					WallCham.Name = "WallCham" 
+					WallCham.AlwaysOnTop = true 
+					WallCham.ZIndex = 5 
+					WallCham.Size = obj.Size + Vec3(0.1,0.1,0.1) 
+					WallCham.AlwaysOnTop = true 
+					WallCham.Transparency = 0.7 
+
+					if values.visuals.players.chams.Toggle then 
+						if values.visuals.players.teammates.Toggle or Player.Team ~= LocalPlayer.Team then 
+							VisibleCham.Visible = true 
+							WallCham.Visible = true 
+						else 
+							VisibleCham.Visible = false 
+							WallCham.Visible = false 
+						end 
+					else 
+						VisibleCham.Visible = false 
+						WallCham.Visible = false 
+					end 
+
+					INSERT(ChamItems, VisibleCham) 
+					INSERT(ChamItems, WallCham) 
+
+					VisibleCham.Color3 = values.visuals.players.chams.Color 
+					WallCham.Color3 = values.visuals.players.chams.Color 
+
+					VisibleCham.AdornCullingMode = "Never" 
+					WallCham.AdornCullingMode = "Never" 
+
+					VisibleCham.Adornee = obj 
+					VisibleCham.Parent = obj 
+
+					WallCham.Adornee = obj 
+					WallCham.Parent = obj 
+				end 
+			end 
+		end 
+	end) 
+end) 
+for _,Player in pairs(Players:GetPlayers()) do 
+	if Player ~= LocalPlayer then 
+		Player:GetPropertyChangedSignal("Team"):Connect(function(new) 
+			wait() 
+			if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then 
+				for _2,Obj in pairs(Player.Character:GetDescendants()) do 
+					if Obj.Name == "VisibleCham" or Obj.Name == "WallCham" then 
+						if values.visuals.players.chams.Toggle then 
+							if values.visuals.players.teammates.Toggle or Player.Team ~= LocalPlayer.Team then 
+								Obj.Visible = true 
+							else 
+								Obj.Visible = false 
+							end 
+						else 
+							Obj.Visible = false 
+						end 
+						Obj.Color3 = values.visuals.players.chams.Color 
+					end 
+				end 
+			end 
+		end) 
+	else 
+		LocalPlayer:GetPropertyChangedSignal("Team"):Connect(function(new) 
+			wait() 
+			for _,Player in pairs(Players:GetPlayers()) do 
+				if Player.Character then 
+					for _2,Obj in pairs(Player.Character:GetDescendants()) do 
+						if Obj.Name == "VisibleCham" or Obj.Name == "WallCham" then 
+							if values.visuals.players.chams.Toggle then 
+								if values.visuals.players.teammates.Toggle or Player.Team ~= LocalPlayer.Team then 
+									Obj.Visible = true 
+								else 
+									Obj.Visible = false 
+								end 
+							else 
+								Obj.Visible = false 
+							end 
+							Obj.Color3 = values.visuals.players.chams.Color 
+						end 
+					end 
+				end 
+			end 
+		end) 
+	end 
+	Player.CharacterAdded:Connect(function(Character) 
+		Character.ChildAdded:Connect(function(obj) 
+			wait(1) 
+			CollisionTBL(obj) 
+		end) 
+		wait(1) 
+		if Player.Character ~= nil and Player.Character:FindFirstChild("HumanoidRootPart") then 
+			local Value = INST("Vector3Value") 
+			Value.Value = Player.Character.HumanoidRootPart.Position 
+			Value.Name = "OldPosition" 
+			Value.Parent = Player.Character.HumanoidRootPart 
+			for _,obj in pairs(Player.Character:GetChildren()) do 
+				if obj:IsA("BasePart") and Player ~= LocalPlayer and obj.Name ~= "HumanoidRootPart" and obj.Name ~= "Head" and obj.Name ~= "BackC4" and obj.Name ~= "HeadHB" then 
+					local VisibleCham = INST("BoxHandleAdornment") 
+					VisibleCham.Name = "VisibleCham" 
+					VisibleCham.AlwaysOnTop = false 
+					VisibleCham.ZIndex = 5 
+					VisibleCham.Size = obj.Size + Vec3(0.1,0.1,0.1) 
+					VisibleCham.AlwaysOnTop = false 
+					VisibleCham.Transparency = 0 
+
+					local WallCham = INST("BoxHandleAdornment") 
+					WallCham.Name = "WallCham" 
+					WallCham.AlwaysOnTop = true 
+					WallCham.ZIndex = 5 
+					WallCham.Size = obj.Size + Vec3(0.1,0.1,0.1) 
+					WallCham.AlwaysOnTop = true 
+					WallCham.Transparency = 0.7 
+
+					if values.visuals.players.chams.Toggle then 
+						if values.visuals.players.teammates.Toggle or Player.Team ~= LocalPlayer.Team then 
+							VisibleCham.Visible = true 
+							WallCham.Visible = true 
+						else 
+							VisibleCham.Visible = false 
+							WallCham.Visible = false 
+						end 
+					else 
+						VisibleCham.Visible = false 
+						WallCham.Visible = false 
+					end 
+
+					INSERT(ChamItems, VisibleCham) 
+					INSERT(ChamItems, WallCham) 
+
+					VisibleCham.Color3 = values.visuals.players.chams.Color 
+					WallCham.Color3 = values.visuals.players.chams.Color 
+
+					VisibleCham.AdornCullingMode = "Never" 
+					WallCham.AdornCullingMode = "Never" 
+
+					VisibleCham.Adornee = obj 
+					VisibleCham.Parent = obj 
+
+					WallCham.Adornee = obj 
+					WallCham.Parent = obj 
+				end 
+			end 
+		end 
+	end) 
+	if Player.Character ~= nil and Player.Character:FindFirstChild("UpperTorso") then 
+		local Value = INST("Vector3Value") 
+		Value.Name = "OldPosition" 
+		Value.Value = Player.Character.HumanoidRootPart.Position 
+		Value.Parent = Player.Character.HumanoidRootPart 
+		for _,obj in pairs(Player.Character:GetChildren()) do 
+			CollisionTBL(obj) 
+			if obj:IsA("BasePart") and Player ~= LocalPlayer and obj.Name ~= "HumanoidRootPart" and obj.Name ~= "Head" and obj.Name ~= "BackC4" and obj.Name ~= "HeadHB" then 
+				local VisibleCham = INST("BoxHandleAdornment") 
+				VisibleCham.Name = "VisibleCham" 
+				VisibleCham.AlwaysOnTop = false 
+				VisibleCham.ZIndex = 5 
+				VisibleCham.Size = obj.Size + Vec3(0.1,0.1,0.1) 
+				VisibleCham.AlwaysOnTop = false 
+				VisibleCham.Transparency = 0 
+
+				local WallCham = INST("BoxHandleAdornment") 
+				WallCham.Name = "WallCham" 
+				WallCham.AlwaysOnTop = true 
+				WallCham.ZIndex = 5 
+				WallCham.Size = obj.Size + Vec3(0.1,0.1,0.1) 
+				WallCham.AlwaysOnTop = true 
+				WallCham.Transparency = 0.7 
+
+				if values.visuals.players.chams.Toggle then 
+					if values.visuals.players.teammates.Toggle or Player.Team ~= LocalPlayer.Team then 
+						VisibleCham.Visible = true 
+						WallCham.Visible = true 
+					else 
+						VisibleCham.Visible = false 
+						WallCham.Visible = false 
+					end 
+				else 
+					VisibleCham.Visible = false 
+					WallCham.Visible = false 
+				end 
+
+				INSERT(ChamItems, VisibleCham) 
+				INSERT(ChamItems, WallCham) 
+
+				VisibleCham.Color3 = values.visuals.players.chams.Color 
+				WallCham.Color3 = values.visuals.players.chams.Color 
+
+				VisibleCham.AdornCullingMode = "Never" 
+				WallCham.AdornCullingMode = "Never" 
+
+				VisibleCham.Adornee = obj 
+				VisibleCham.Parent = obj 
+
+				WallCham.Adornee = obj 
+				WallCham.Parent = obj 
+			end 
+		end 
+	end 
+end 			Obj.Color3 = values.visuals.players.chams.Color 
 				end 
 			end 
 		end 
